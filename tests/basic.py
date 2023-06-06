@@ -25,7 +25,13 @@ decoder_pipe = create_image_text_pipe(
     text_tokenizer=text_tokenizer,
 )
 
-ll = create_wds_loader('/cc12m/cc12m-train-{0000..2175}.tar', decoder_pipe)
+ll = create_wds_loader(
+    '/cc12m/cc12m-train-{0000..2175}.tar',
+    decoder_pipe,
+    is_train=True,
+    num_samples=int(11e6),  # very approx
+    batch_size=64,
+)
 
 for i, (img, text) in enumerate(ll.loader):
     print(i, img.shape, text.shape)
