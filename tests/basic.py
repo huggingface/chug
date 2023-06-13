@@ -17,12 +17,17 @@ image_preprocess = create_transform(
 )
 
 tokenizer = AutoTokenizer.from_pretrained("openai/clip-vit-base-patch32")
-text_tokenizer = lambda x: tokenizer(
-    x, return_tensors='pt', max_length=77, padding='max_length', truncation=True).input_ids
+text_preprocess = lambda x: tokenizer(
+    x,
+    return_tensors='pt',
+    max_length=77,
+    padding='max_length',
+    truncation=True,
+).input_ids
 
 decoder_pipe = create_image_text_pipe(
     image_preprocess=image_preprocess,
-    text_tokenizer=text_tokenizer,
+    text_preprocess=text_preprocess,
 )
 
 ll = create_wds_loader(
