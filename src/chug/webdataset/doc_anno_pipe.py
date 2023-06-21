@@ -1,5 +1,6 @@
 import json
 import io
+import logging
 import random
 from functools import partial
 
@@ -9,9 +10,10 @@ from PIL import Image
 
 from .loader import log_and_continue
 
+_logger = logging.getLogger(__name__)
 
 def filter_no_annotation_or_no_image(sample):
-    # FIXME check sample for valid doc/image + annotation
+    # FIXME check sample for valid doc/image and annotation
     return True
 
 
@@ -37,16 +39,24 @@ class DocProcessor:
     def __call__(self, sample):
         anno = json.loads(sample['json'])
 
-        page_anno = self.anno_preprocess(anno, generator=self.generator)
-        if isinstance(anno, (tuple, list)):
+        try:
+            page_anno = self.anno_preprocess(anno, generator=self.generator)
+        except Exception as exn:
+            _logger.error(f'Issue processing annotation for {sample["__url__"]}, {sample["__key__"]}.')
+            #_logger.error(json.dumps(anno, indent=4))
+            raise(exn)
+
+        info = None
+        if isinstance(page_anno, tuple):
             page_anno, info = page_anno
-            num_pages = info.get('num_pages', 1)  # original # pages
             page_indices = info.get('page_indices', [0])  # the samples page indices
+            num_decode_pages = len(page_indices)
+            num_anno_pages = info.get('num_pages', 1)
             page_image_info = info.get('image_info', None)
             if page_image_info is not None:
                 assert len(page_image_info) == len(page_indices)
         else:
-            num_pages = 1
+            num_decode_pages = num_anno_pages = 1
             page_indices = [0]
             page_image_info = None
 
@@ -56,32 +66,35 @@ class DocProcessor:
             if ext in sample:
                 with io.BytesIO(sample[ext]) as b:
                     image = Image.open(b)
-                    multi_page_image = getattr(image, 'n_frames', 1) > 1
+                    num_image_pages = getattr(image, 'n_frames', 1)
+                    if num_image_pages != num_anno_pages:
+                        _logger.warning(
+                            f'Mismatch between num image and num annotation pages {num_image_pages} != {num_anno_pages}'
+                            f' for sample {sample["__url__"]}, {sample["__key__"]}.')
                     for i, page_index in enumerate(page_indices):
-                        if multi_page_image:
-                            page = image.seek(page_index)
+                        if num_image_pages > 1:
+                            image.seek(page_index)
                         else:
-                            assert num_pages == 1
+                            assert num_anno_pages == 1
                             image.load()
-                            page = image
 
                         if self.image_fmt:
-                            page = page.convert(self.image_fmt)
+                            image = image.convert(self.image_fmt)
 
                         if page_image_info is not None:
                             # FIXME, if train objective involves masking or otherwise processing image
                             #  with knowledge of annotations / text content, anno info should contain
                             #  mask locations, etc. For such a task, we need to pass it to image preprocess
-                            page = self.image_preprocess(page, page_info=page_image_info[i])
+                            image = self.image_preprocess(image, page_info=page_image_info[i])
                         else:
-                            page = self.image_preprocess(page)
+                            image = self.image_preprocess(image)
                         # FIXME note, should move to torchvision v2 annotations at some point, they should
                         #  have a generator arg (eventually) which will make proper state restore possible
-                        page_images.append(page)
+                        page_images.append(image)
 
         assert len(page_images), 'No page images present'
 
-        if self.squeeze_pages and num_pages == 1:
+        if self.squeeze_pages and num_decode_pages == 1:
             # FIXME always list?
             page_images = page_images[0]
             page_anno = {k: v[0] for k, v in page_anno.items()}
