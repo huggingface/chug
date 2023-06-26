@@ -16,8 +16,8 @@ from webdataset.tariterators import base_plus_ext, url_opener, tar_file_expander
 
 from chug.common import LoaderBundle, SharedCount
 
-_SAMPLE_SHUFFLE_SIZE = 5000
-_SAMPLE_SHUFFLE_INITIAL = 1000
+_SAMPLE_SHUFFLE_SIZE = 2000
+_SAMPLE_SHUFFLE_INITIAL = 500
 
 
 def expand_urls(urls, weights=None):
