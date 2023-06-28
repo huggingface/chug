@@ -59,8 +59,8 @@ class DocProcessor:
             num_anno_pages,
     ):
         with io.BytesIO(sample[ext]) as b:
-            image = Image.open(b)
-            num_image_pages = getattr(image, 'n_frames', 1)
+            doc_image = Image.open(b)
+            num_image_pages = getattr(doc_image, 'n_frames', 1)
             if num_image_pages != num_anno_pages:
                 _logger.warning(
                     f'Mismatch between num image and num annotation pages {num_image_pages} != {num_anno_pages}'
@@ -68,13 +68,12 @@ class DocProcessor:
             pages = []
             for i, page_index in enumerate(page_indices):
                 if num_image_pages > 1:
-                    image.seek(page_index)
+                    doc_image.seek(page_index)
                 else:
                     assert num_anno_pages == 1
-                    image.load()
+                    doc_image.load()
 
-                if self.image_fmt:
-                    image = image.convert(self.image_fmt)
+                page_image = doc_image.convert(self.image_fmt)
 
                 # if page_image_info is not None:
                 #     # FIXME, if train objective involves masking or otherwise processing image
@@ -82,9 +81,10 @@ class DocProcessor:
                 #     #  mask locations, etc. For such a task, we need to pass it to image preprocess
                 #     image = self.image_preprocess(image, page_info=page_image_info[i])
                 # else:
-                image = self.image_preprocess(image)
-            pages += [image]
-        return image, num_image_pages
+                page_image = self.image_preprocess(page_image)
+                pages += [page_image]
+
+            return pages, num_image_pages
 
     def _decode_pdf_pages(
             self,
@@ -98,14 +98,16 @@ class DocProcessor:
             assert fitz is not None, "fitz (pymupdf) is not installed and enabled"
             doc = fitz.Document(stream=b)
             num_image_pages = doc.page_count
+            if num_image_pages != num_anno_pages:
+                _logger.warning(
+                    f'Mismatch between num image and num annotation pages {num_image_pages} != {num_anno_pages}'
+                    f' for sample {sample["__url__"]}, {sample["__key__"]}.')
             pages = []
             for i, page_index in enumerate(page_indices):
                 page = doc.load_page(page_index)
                 pixmap = page.get_pixmap(dpi=150)
-                image = Image.frombuffer('RGB', (pixmap.width, pixmap.height), pixmap.samples)
-
-                if self.image_fmt:
-                    image = image.convert(self.image_fmt)
+                page_image = Image.frombuffer('RGB', (pixmap.width, pixmap.height), pixmap.samples)
+                page_image = page_image.convert(self.image_fmt)
 
                 # if page_image_info is not None:
                 #     # FIXME, if train objective involves masking or otherwise processing image
@@ -113,10 +115,10 @@ class DocProcessor:
                 #     #  mask locations, etc. For such a task, we need to pass it to image preprocess
                 #     image = self.image_preprocess(image, page_info=page_image_info[i])
                 # else:
-                image = self.image_preprocess(image)
-            pages += [image]
+                page_image = self.image_preprocess(page_image)
+                pages += [page_image]
 
-        return pages, num_image_pages
+            return pages, num_image_pages
 
     def __call__(self, sample):
         anno = json.loads(sample['json'])
