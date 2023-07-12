@@ -13,10 +13,11 @@ def filter_no_caption_or_no_image(sample):
 
 def create_image_text_pipe(
     image_preprocess,
-    text_preprocess,
+    anno_preprocess,
     decoder=None,
     image_key="jpg;png;jpeg;webp",
     text_key="txt",
+    image_fmt='L',
     as_tuple=True,
 ):
     if decoder is None or isinstance(decoder, str):
@@ -31,8 +32,9 @@ def create_image_text_pipe(
         wds.select(filter_no_caption_or_no_image),
         decoder,
         wds.rename(image=image_key, text=text_key),  # FIXME make mapping configurable
-        wds.map_dict(image=image_preprocess, text=text_preprocess),
+        wds.map_dict(image=image_preprocess),
+        wds.map(lambda sample: {**sample, **anno_preprocess(sample['text'])}),  # merge the dictionaries
     ]
     if as_tuple:
-        pipe += [wds.to_tuple("image", "text")]
+        pipe += [wds.to_tuple("image", "target", "text")]
     return pipe
