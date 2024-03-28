@@ -1,2 +1,6 @@
 torch
+timm
 webdataset
+datasets
+pypdfium2
+simple_parsing

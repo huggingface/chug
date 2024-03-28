@@ -9,19 +9,19 @@ authors = [
 ]
 description = ""
 readme = "README.md"
-requires-python = ">=3.7"
-keywords = ["webdataset", "dataset", "sharded", "cluster", "scale"]
+requires-python = ">=3.8"
+keywords = ["webdataset", "datasets", "sharded", "cluster", "scale", "documents"]
 license = {text = "Apache-2.0"}
 classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Software Development',
@@ -29,9 +29,21 @@ classifiers = [
         'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 dependencies = [
-    "webdataset",
-    'importlib-metadata; python_version<"3.8"',
+        "webdataset",
+        "timm",
+        "torch",
+        "simple_parsing",
+        "pypdfium2",
+        'importlib-metadata; python_version<"3.8"',
 ]
+
+[project.optional-dependencies]
+# albumentations (nougat augs)
+alb = [
+        "albumentations",
+        'cv2',
+]
+
 dynamic = ["version"]
 
 [tool.pdm.version]
