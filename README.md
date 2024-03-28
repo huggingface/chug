@@ -8,6 +8,8 @@ A library to help w/ efficient training for multi-modal data. Initially focused 
 
 Hugging Face `datasets` are supported and work great for exploration, validation, and fine-tune use cases.
 
+`chug` provides on the fly PDF decoding and rendering via either pypdfium2 (https://github.com/pypdfium2-team/pypdfium2) as a default, or fitz/pymupdf (https://github.com/pymupdf/PyMuPDF) if your use case is okay with their AGPL-3.0 license. `fitz` support must be manually enabled. The pdf handling is implemented at the webdataset level, so you can plug it in to other webdataset pipelines. This enables large scale sharded streaming of native .pdf files without needing to pre-render to .png/.tiff, etc.
+
 ## Design
 
 ### Submodule Hierarchy
