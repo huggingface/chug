@@ -1,21 +1,21 @@
 # Chugging Data 
 
-A library to help w/ efficient training with multi-modal data. Initially focused on image & document + text tasks.
+A library to help w/ efficient training for multi-modal data. Initially focused on image & document + text tasks.
 
 `chug` currently leverages `webdataset` and Huggingface `datasets`. `webdataset` tar files and dataset pipelines are preferred for scalable pretraining. For ease of use, Huggingface `datasets` are also supported and work great for exploration, validation, and fine-tune use cases.
 
 ## TODOs
 
 ### Nearish
-* Cleanup and refinement, codebase will change.
-* Documentation & unit-tests.
-* Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm).
-* Support unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.).
+* Cleanup and refinement, codebase will change
+* Documentation & unit-tests
+* Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
+* Support unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
  
 ### Longish 
-* Increase range of task pipelines for other tasks, modelling needs.
-* Support additional modalities & targets (video, audio, detection/dense pixel targets, image/video/audio targets).
-* Explore alternatives to .tar shards (array_record, arrow, etc).
+* Increase range of task pipelines for other tasks, modelling needs
+* Support additional modalities & targets (video, audio, detection/dense pixel targets, image/video/audio targets)
+* Explore alternatives to .tar shards (array_record, arrow, etc)
 
 ## Usage / Examples
 
@@ -39,7 +39,6 @@ task_cfg = chug.DataTaskDocReadCfg(
 task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/IDL-wds/resolve/main/idl-train-0{0000..1000}.tar',  # FIXME range
-    split='train',
     batch_size=8,
     num_samples=1000000,  # FIXME get actual value
     num_workers=0,
@@ -95,9 +94,8 @@ task_cfg = chug.DataTaskDocReadCfg(
 task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/pdfa-english-train/resolve/main/pdfa-eng-train-{000000..005000}.tar',
-    split='train',
     batch_size=8,
-    num_samples=1000000,  # FIXME approx
+    num_samples=1000000,  # FIXME replace with actual
     format='wds',   
 )
 lb = chug.create_loader(
@@ -153,9 +151,8 @@ task_cfg = chug.DataTaskImageTextCfg(
 task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/cc12m-wds/resolve/main/cc12m-train-{0000..2175}.tar',
-    split='train',
     batch_size=8,
-    num_samples=10000000,
+    num_samples=10000000,  # FIXME replace with actual
     format='wds',   
 )
 lb = chug.create_loader(
@@ -189,7 +186,6 @@ task_pipe = create_task_pipeline(task_cfg)
 
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/docvqa-wds/resolve/main/docvqa-train-{000..383}.tar',
-    split='train',
     batch_size=8,
     format='wds',
     num_samples=39463,
