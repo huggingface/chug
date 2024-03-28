@@ -76,7 +76,7 @@ Task specific pipelines, where dataset formats meet modelling needs.
 
 Inputs to task pipelines are sample dictionaries based on the dataset form, they are decoded and then processed into outputs that match model input requirements.
 
-Task specific pipelines are inserted into the more generic data pipeline.
+Task specific pipelines that handle the data <--> model input interface are inserted into an encompassing data pipeline which handles shard lists, shuffle, wrapping, distributed worker, splitting, batching, etc.
 
 #### `chug.loader`
 
