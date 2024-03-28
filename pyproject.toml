@@ -36,6 +36,11 @@ dependencies = [
         "pypdfium2",
         'importlib-metadata; python_version<"3.8"',
 ]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/huggingface/chug"
+repository = "https://github.com/huggingface/chug"
 
 [project.optional-dependencies]
 # albumentations (nougat augs)
@@ -43,8 +48,6 @@ alb = [
         "albumentations",
         'cv2',
 ]
-
-dynamic = ["version"]
 
 [tool.pdm.version]
 source = "file"
