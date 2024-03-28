@@ -14,6 +14,8 @@ Hugging Face `datasets` are supported and work great for exploration, validation
 
 This library is still a WIP, consider this an alpha release (pre announcement). Major features should be working, the library has been tested with several PDF datasets we will shortly make public. However, do expect there will still be breaking changes, lots of improvements, etc.
 
+`pip install --pre chug` will install the current dev version.
+
 ### TODOs
 
 ### Nearish
