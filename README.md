@@ -122,7 +122,6 @@ task_cfg = chug.DataTaskDocReadCfg(
     page_sampling='random',
     error_handler='dump_and_reraise',
 )
-task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/IDL-wds/resolve/main/idl-train-0{0000..2999}.tar',
     batch_size=8,
@@ -142,8 +141,6 @@ sample = next(ii)
 ```python
 import chug
 task_cfg = chug.DataTaskDocReadCfg(page_sampling='all')
-task_pipe = chug.create_task_pipeline(task_cfg)
-
 data_cfg = chug.DataCfg(
     source='pixparse/IDL-wds',
     split='train',
@@ -176,7 +173,6 @@ task_cfg = chug.DataTaskDocReadCfg(
     text_process_fn=txt_fn,
     page_sampling='random',
 )
-task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/pdfa-english-train/resolve/main/pdfa-eng-train-{000000..005000}.tar',
     batch_size=8,
@@ -200,7 +196,6 @@ import chug
 task_cfg = chug.DataTaskDocReadCfg(
     page_sampling='all',
 )
-task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pixparse/pdfa-eng-wds',
     split='train',
@@ -233,7 +228,6 @@ task_cfg = chug.DataTaskImageTextCfg(
     image_process_fn=img_fn,
     text_process_fn=txt_fn,
 )
-task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/cc12m-wds/resolve/main/cc12m-train-{0000..2175}.tar',
     batch_size=8,
@@ -267,8 +261,6 @@ task_cfg = chug.DataTaskDocVqaCfg(
     image_process_fn=img_fn,
     text_process_fn=txt_fn,
 )
-task_pipe = create_task_pipeline(task_cfg)
-
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/docvqa-wds/resolve/main/docvqa-train-{000..383}.tar',
     batch_size=8,
@@ -295,7 +287,6 @@ task_cfg = chug.DataTaskDocVqaCfg(
     answer_prefix='Answer: ',
     answer_suffix=''
 )
-task_pipe = create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
     source='pixparse/docvqa-single-page-questions',
     split='validation',
