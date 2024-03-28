@@ -1,6 +1,4 @@
 import random
-import numbers
-from typing import List
 
 import numpy as np
 import torch

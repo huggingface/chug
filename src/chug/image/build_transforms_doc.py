@@ -1,7 +1,8 @@
 from typing import Optional
 
 from chug.common import ImageInputCfg, ImageAugCfg
-from chug.image.transforms_torch import AlignLongAxis, Bitmap, Erosion, Dilation, CropMargin
+
+from .transforms_torch import AlignLongAxis, Bitmap, Erosion, Dilation, CropMargin
 
 # NOTE, chug currently depends on some time aug impl, this should be flipped if timm ends up
 # leveraging chug data pipelines.

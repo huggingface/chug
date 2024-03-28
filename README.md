@@ -2,7 +2,93 @@
 
 A library to help w/ efficient training for multi-modal data. Initially focused on image & document + text tasks.
 
-`chug` currently leverages `webdataset` and Huggingface `datasets`. `webdataset` tar files and dataset pipelines are preferred for scalable pretraining. For ease of use, Huggingface `datasets` are also supported and work great for exploration, validation, and fine-tune use cases.
+`chug` currently leverages `webdataset` and Huggingface `datasets`.
+
+`webdataset` tar files and dataset pipelines are preferred for scalable pretraining. 
+
+Huggingface `datasets` are supported and work great for exploration, validation, and fine-tune use cases.
+
+## Design
+
+### Submodule Hierarchy
+
+The library has been designed so that functions, classes at different levels can be used independently.
+
+If one wants to build a loader & pipeline with JSON/YAML serializable configs, use the top-level `chug.create_loader()` in `chug/loader.py`. Depending on dataset sources, one can easily switch this between webdataset, HF datasets (in the future, other sources).
+
+Bypassing the highest level, one can also call `build_pipeline_*` methods in `task_pipeline` and then call `create_loader_wds` with a full array of args for `wds` only use cases.
+
+If one doesn't want to use `chug` loaders and pipelines at all, `image`, `text`, and `wds` (especially decoder) functionality may be useful in other projects.
+
+#### Library modules (highest to lowest level)
+
+The dependencies of modules within the library are intended to follow the hierarchy below. e.g. doc depends on wds, but wds should never depend on doc.
+
+```
+app
+|
+loader (chug/loader.py)
+|
+task_pipeline
+|
+doc
+|
+wds, hfds, image, text
+|
+common
+```
+
+### Submodules
+
+#### `common`
+
+Configs, structures (dataclasses) for general use across the library
+
+#### `wds`
+
+Webdataset (`wds` for short) specific code. Extensions and alterations of webdataset functionality to fit covered use case and improve robustness.
+
+All data pipelines in `chug` currently leverage `wds` pipelines, even when not using `wds` datasets. 
+
+Document oriented decoding (pdf decoder) is present in `chug/wds/decode.py`, it can be used with any webdataset pipeline as a decoder. e.g. `wds.decode(chug.wds.DecodeDoc('pill'), 'pill')`
+
+#### `hfds`
+
+Huggingface `datasets` support. A minimal wrapper that allows `datasets` to be used with chug processing pipelines. 
+
+The processing pipelines remain webdataset based when using `datasets`, they are invoked by a custom collate class.
+
+#### `image`
+
+Image processing, `torchvision` and `albumentations` based transform building code. A mix of generic image (imagenet, simclr) transforms and document specific transforms, including an implementation of `albumentations` based `nougat` transforms.
+
+#### `text`
+
+Text processing, tokenization code.
+
+#### `doc`
+
+Document processing code. Currently focused on processors that apply image/pdf decoders and process document OCR or VQA annotations.
+
+#### `task_pipeline`
+
+Task specific pipelines, where dataset formats meet modelling needs. 
+
+Inputs to task pipelines are sample dictionaries based on the dataset form, they are decoded and then processed into outputs that match model input requirements.
+
+Task specific pipelines are inserted into the more generic data pipeline.
+
+#### `chug.loader`
+
+This lone top-level file includes the main factory methods for creating loaders w/ associated pipelines from config dataclasses.
+
+#### `app`
+
+Most applications using `chug` will exist outside of the lib in training libraries, etc. Some builtin utility / exploration apps will be included here.
+
+## Concepts
+
+WIP
 
 ## TODOs
 
@@ -38,10 +124,9 @@ task_cfg = chug.DataTaskDocReadCfg(
 )
 task_pipe = chug.create_task_pipeline(task_cfg)
 data_cfg = chug.DataCfg(
-    source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/IDL-wds/resolve/main/idl-train-0{0000..1000}.tar',  # FIXME range
+    source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/IDL-wds/resolve/main/idl-train-0{0000..2999}.tar',
     batch_size=8,
-    num_samples=1000000,  # FIXME get actual value
-    num_workers=0,
+    num_samples=3144726,
     format='wds',
 )
 lb = chug.create_loader(
@@ -49,7 +134,7 @@ lb = chug.create_loader(
     task_cfg,
     is_training=True,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -70,7 +155,7 @@ lb = chug.create_loader(
     data_cfg,
     task_cfg,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -103,7 +188,7 @@ lb = chug.create_loader(
     task_cfg,
     is_training=True,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -127,7 +212,7 @@ lb = chug.create_loader(
     data_cfg,
     task_cfg,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -160,7 +245,7 @@ lb = chug.create_loader(
     task_cfg,
     is_training=True,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -195,7 +280,7 @@ lb = chug.create_loader(
     task_cfg,
     is_training=True,
 )
-ii = iter(lb.loader)
+ii = iter(lb)
 sample = next(ii)
 ```
 
@@ -222,5 +307,6 @@ lb = chug.create_loader(
     data_cfg,
     task_cfg
 )
-ii = iter(lb.loader)
+ii = iter(lb)
+sample = next(ii)
 ```

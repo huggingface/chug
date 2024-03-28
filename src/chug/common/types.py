@@ -19,6 +19,10 @@ class SharedCount:
 
 @dataclass
 class LoaderBundle:
+    """
+    Bundle a DataLoader with num_batch / num_sample limits, sampler or shared_interval counter exposed
+    to allow easy seed control per-interval.
+    """
     loader: DataLoader
     num_batches: int = 0
     num_samples: int = 0
@@ -30,6 +34,9 @@ class LoaderBundle:
             self.shared_interval.set_value(interval)
         if self.sampler is not None and isinstance(self.sampler, DistributedSampler):
             self.sampler.set_epoch(interval)
+
+    def __iter__(self):
+        return self.loader.__iter__()
 
 
 @dataclass

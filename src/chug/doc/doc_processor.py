@@ -5,7 +5,7 @@ import random
 from typing import Callable, Dict, List, Optional, Tuple
 
 from chug.common import FeatureInfo, ImageFeatureInfo
-from chug.wds.decode import decode_image_pages, decode_pdf_pages
+from chug.wds import decode_image_pages, decode_pdf_pages
 
 
 from .constants import (
