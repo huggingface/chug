@@ -2,11 +2,11 @@
 
 A library to help w/ efficient training for multi-modal data. Initially focused on image & document + text tasks.
 
-`chug` currently leverages `webdataset` and Huggingface `datasets`.
+`chug` currently leverages `webdataset` and Hugging Face `datasets`.
 
 `webdataset` tar files and dataset pipelines are preferred for scalable pretraining. 
 
-Huggingface `datasets` are supported and work great for exploration, validation, and fine-tune use cases.
+Hugging Face `datasets` are supported and work great for exploration, validation, and fine-tune use cases.
 
 ## Design
 
@@ -54,7 +54,7 @@ Document oriented decoding (pdf decoder) is present in `chug/wds/decode.py`, it 
 
 #### `hfds`
 
-Huggingface `datasets` support. A minimal wrapper that allows `datasets` to be used with chug processing pipelines. 
+Hugging Face `datasets` support. A minimal wrapper that allows `datasets` to be used with chug processing pipelines. 
 
 The processing pipelines remain webdataset based when using `datasets`, they are invoked by a custom collate class.
 
