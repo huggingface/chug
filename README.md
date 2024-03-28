@@ -10,6 +10,23 @@ Hugging Face `datasets` are supported and work great for exploration, validation
 
 `chug` provides on the fly PDF decoding and rendering via either pypdfium2 (https://github.com/pypdfium2-team/pypdfium2) as a default, or fitz/pymupdf (https://github.com/pymupdf/PyMuPDF) if your use case is okay with their AGPL-3.0 license. `fitz` support must be manually enabled. The pdf handling is implemented at the webdataset level, so you can plug it in to other webdataset pipelines. This enables large scale sharded streaming of native .pdf files without needing to pre-render to .png/.tiff, etc.
 
+## Status
+
+This library is still a WIP, consider this an alpha release (pre announcement). Major features should be working, the library has been tested with several PDF datasets we will shortly make public. However, do expect there will still be breaking changes, lots of improvements, etc.
+
+### TODOs
+
+### Nearish
+* Cleanup and refinement, codebase will change
+* Documentation & unit-tests
+* Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
+* Support unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
+ 
+### Longish 
+* Increase range of task pipelines for other tasks, modelling needs
+* Support additional modalities & targets (video, audio, detection/dense pixel targets, image/video/audio targets)
+* Explore alternatives to .tar shards (array_record, arrow, etc)
+
 ## Design
 
 ### Submodule Hierarchy
@@ -91,19 +108,6 @@ Most applications using `chug` will exist outside of the lib in training librari
 ## Concepts
 
 WIP
-
-## TODOs
-
-### Nearish
-* Cleanup and refinement, codebase will change
-* Documentation & unit-tests
-* Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
-* Support unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
- 
-### Longish 
-* Increase range of task pipelines for other tasks, modelling needs
-* Support additional modalities & targets (video, audio, detection/dense pixel targets, image/video/audio targets)
-* Explore alternatives to .tar shards (array_record, arrow, etc)
 
 ## Usage / Examples
 
