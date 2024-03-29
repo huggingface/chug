@@ -24,7 +24,7 @@ This library is still a WIP, consider this an alpha release (pre announcement). 
 * Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
 
 ### Mediumish
-* Uified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
+* Unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
 * Image token (patch) packing ala NaViT. Online bin packing based algorithms integrated with image preprocessing and pipeline.
 
 ### Longish 
@@ -242,7 +242,7 @@ task_cfg = chug.DataTaskImageTextCfg(
 data_cfg = chug.DataCfg(
     source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/cc12m-wds/resolve/main/cc12m-train-{0000..2175}.tar',
     batch_size=8,
-    num_samples=10000000,  # FIXME replace with actual
+    num_samples=10968539,
     format='wds',   
 )
 lb = chug.create_loader(
