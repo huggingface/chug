@@ -134,7 +134,7 @@ task_cfg = chug.DataTaskDocReadCfg(
     error_handler='dump_and_reraise',
 )
 data_cfg = chug.DataCfg(
-    source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/IDL-wds/resolve/main/idl-train-0{0000..2999}.tar',
+    source='pipe:curl -s -f -L https://huggingface.co/datasets/pixparse/idl-wds/resolve/main/idl-train-0{0000..2999}.tar',
     batch_size=8,
     num_samples=3144726,
     format='wds',
@@ -153,7 +153,7 @@ sample = next(ii)
 import chug
 task_cfg = chug.DataTaskDocReadCfg(page_sampling='all')
 data_cfg = chug.DataCfg(
-    source='pixparse/IDL-wds',
+    source='pixparse/idl-wds',
     split='train',
     batch_size=None,
     format='hfids',
