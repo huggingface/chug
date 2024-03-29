@@ -216,7 +216,6 @@ class DecodeDoc:
         """
         extension = re.sub(r".*[.]", "", key)
         if extension not in {'pdf', 'tiff', 'tif'}:
-            print('skippy bippy')
             return None
 
         imagespec = self.imagespec
