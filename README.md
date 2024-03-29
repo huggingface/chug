@@ -115,6 +115,13 @@ Most applications using `chug` will exist outside of the lib in training librari
 
 WIP
 
+## Datasets
+
+Datasets that work well with this library can be found on the Hugging Face Hub under the `pixparse` organization (https://huggingface.co/pixparse).
+
+We'll add links to other noteworthy datasets that can be used as we become aware of them.
+
+
 ## Usage / Examples
 
 ### Document Reading, Training w/ IDL
