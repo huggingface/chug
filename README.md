@@ -22,8 +22,11 @@ This library is still a WIP, consider this an alpha release (pre announcement). 
 * Cleanup and refinement, codebase will change
 * Documentation & unit-tests
 * Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
-* Support unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
- 
+
+### Mediumish
+* Uified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
+* Image token (patch) packing ala NaViT. Online bin packing based algorithms integrated with image preprocessing and pipeline.
+
 ### Longish 
 * Increase range of task pipelines for other tasks, modelling needs
 * Support additional modalities & targets (video, audio, detection/dense pixel targets, image/video/audio targets)
