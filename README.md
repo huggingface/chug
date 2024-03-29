@@ -24,6 +24,7 @@ This library is still a WIP, consider this an alpha release (pre announcement). 
 * Support reading of info .json/.yaml files for automatic shard info resolution for webdatasets (like timm)
 
 ### Mediumish
+* Option to output bbox annotations for lines (or word + word output) for tasks that leverage layout
 * Unified preprocessor functions for combined image + text tokenization (img+text token interleaving, etc.)
 * Image token (patch) packing ala NaViT. Online bin packing based algorithms integrated with image preprocessing and pipeline.
 
