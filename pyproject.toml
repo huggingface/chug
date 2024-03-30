@@ -30,11 +30,11 @@ classifiers = [
 ]
 dependencies = [
         "webdataset",
+        "datasets",
         "timm",
         "torch",
         "simple_parsing",
         "pypdfium2",
-        'importlib-metadata; python_version<"3.8"',
 ]
 dynamic = ["version"]
 
