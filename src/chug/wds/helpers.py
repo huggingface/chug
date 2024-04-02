@@ -8,7 +8,8 @@ from urllib.parse import urlparse
 
 import braceexpand
 import webdataset as wds
-from torch.utils.data import get_worker_info
+
+from chug.common import SharedCount
 
 
 def urldir(url):
@@ -43,17 +44,36 @@ def expand_urls(urls, weights=None):
 
 
 def pytorch_worker_seed(increment=0):
-    """get dataloader worker seed from pytorch"""
+    """get dataloader worker seed from pytorch
+    """
+    from torch.utils.data import get_worker_info
+
+    increment_value = increment.get_value() if isinstance(increment, SharedCount) else increment
     worker_info = get_worker_info()
     if worker_info is not None:
         # favour using the seed already created for pytorch dataloader workers if it exists
         seed = worker_info.seed
-        if increment:
+        num_workers = worker_info.num_workers
+        if increment_value:
             # space out seed increments so they can't overlap across workers in different iterations
-            seed += increment * max(1, worker_info.num_workers)
-        return seed
-    # fallback to wds rank based seed
-    return wds.utils.pytorch_worker_seed()
+            seed += increment_value * max(1, num_workers)
+    else:
+        # fallback, try to grab values from environment
+        rank = 0
+        world_size = 1
+        worker = 0
+        num_workers = 1
+        if "RANK" in os.environ and "WORLD_SIZE" in os.environ:
+            rank = int(os.environ["RANK"])
+            world_size = int(os.environ["WORLD_SIZE"])
+        if "WORKER" in os.environ and "NUM_WORKERS" in os.environ:
+            worker = int(os.environ["WORKER"])
+            num_workers = int(os.environ["NUM_WORKERS"])
+        seed = rank * max(1024, world_size) + worker
+        if increment_value:
+            seed += increment_value * max(1024, num_workers)
+
+    return seed
 
 
 def log_and_continue(exn):

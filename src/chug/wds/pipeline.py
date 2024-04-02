@@ -5,7 +5,7 @@ import webdataset
 import webdataset as wds
 
 from chug.common import ShardSpec, collate
-from .helpers import log_and_continue
+from .filters import detshuffle_v2
 from .shardlists import ResampledShardsV2, ShuffledShardList
 from .tariterators import tarfile_to_samples_nothrow
 
@@ -82,10 +82,17 @@ def build_data_pipeline(
         # at this point, we have an iterator over the shards assigned to each worker at each node
         datapipe.extend([
             tarfile_to_samples_nothrow(handler=handler),
-            wds.shuffle(
+            detshuffle_v2(
                 bufsize=sample_shuffle_size,
                 initial=sample_shuffle_initial,
-            ),
+                seed=seed,
+                interval=shared_interval_count,
+                unique_worker=True,
+            )
+            # wds.shuffle(
+            #     bufsize=sample_shuffle_size,
+            #     initial=sample_shuffle_initial,
+            # ),
         ])
     else:
         datapipe.extend([
