@@ -327,4 +327,4 @@ sample = next(ii)
 
 The image/document augmentations in `chug` rely on a number of external influences. Our document oriented `doc_better` torchvision augmentations are influenced by `nougat`, and the `doc_nougat` is a direct adaptation of the [`albumentations`](https://albumentations.ai/) + `cv2` document pipeline in [`nougat`](https://github.com/facebookresearch/nougat). Several image augmentations leverage existing work in the `timm` library.
 
-Also, big thanks to the maintainers of [`webdataset`](https://github.com/webdataset/webdataset) and Huffing Face [`datasets`](https://github.com/huggingface/datasets).
+Also, big thanks to the maintainers of [`webdataset`](https://github.com/webdataset/webdataset) and Hugging Face [`datasets`](https://github.com/huggingface/datasets).
