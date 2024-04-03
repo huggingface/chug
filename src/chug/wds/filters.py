@@ -5,8 +5,7 @@ from typing import Mapping, Sequence, Union
 import webdataset as wds
 from webdataset.filters import _shuffle
 
-from chug.common import SharedCount
-from .helpers import pytorch_worker_seed
+from chug.common import SharedCount, get_pytorch_worker_seed
 
 
 class detshuffle_v2(wds.PipelineStage):
@@ -38,7 +37,7 @@ class detshuffle_v2(wds.PipelineStage):
         if self.unique_worker:
             # Use the PyTorch worker's seed, *different* across all nodes/workers
             # but also deterministic if they are set consistently
-            seed = pytorch_worker_seed(interval)
+            seed = get_pytorch_worker_seed(interval, initial_seed=self.seed)
         else:
             # This seed to be deterministic AND the *same* across all nodes/workers in each epoch/interval
             seed = self.seed + interval

@@ -3,8 +3,8 @@ import sys
 
 from torch.utils.data import IterableDataset
 
-from chug.common import SharedCount
-from .helpers import expand_urls, pytorch_worker_seed
+from chug.common import SharedCount, get_pytorch_worker_seed
+from .helpers import expand_urls
 
 
 class ShuffledShardList(IterableDataset):
@@ -70,6 +70,7 @@ class ResampledShardsV2(IterableDataset):
             worker_seed_fn=None,
             deterministic=False,
             interval=-1,
+            seed=None,
     ):
         """Sample shards from the shard list with replacement.
 
@@ -89,6 +90,7 @@ class ResampledShardsV2(IterableDataset):
         self.worker_seed_fn = worker_seed_fn
         self.deterministic = deterministic
         self.interval = interval
+        self.seed = seed  # only used when seed cannot be recovered from DL workers
 
     def __iter__(self):
         """Return an iterator over the shards."""
@@ -104,8 +106,8 @@ class ResampledShardsV2(IterableDataset):
             # reset seed w/ interval if deterministic
             if self.worker_seed_fn is None:
                 # pytorch worker seed should be deterministic (per-worker)
-                # It is init by arg.seed + rank + worker id
-                seed = pytorch_worker_seed(interval)
+                # It is init by process seed, rank, & worker id
+                seed = get_pytorch_worker_seed(interval, initial_seed=self.seed)
             else:
                 seed = self.worker_seed_fn() + interval
             self.rng.seed(seed)

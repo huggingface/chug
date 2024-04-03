@@ -57,6 +57,7 @@ def build_data_pipeline(
             weights=shards.weights,
             deterministic=True,
             interval=shared_interval_count,
+            seed=seed,
         )]
     else:
         assert shards.weights is None, \

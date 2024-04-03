@@ -1,10 +1,12 @@
 import dataclasses
 import math
+import warnings
 from typing import Callable, List, Optional, Union
 
+import torch.utils.data
 import webdataset as wds
 
-from chug.common import DistributedCfg, LoaderBundle, SharedCount, ShardSpec
+from chug.common import DistributedCfg, LoaderBundle, SharedCount, ShardSpec, seed_worker
 from .helpers import expand_urls
 from .pipeline import build_data_pipeline
 
@@ -77,9 +79,9 @@ def create_loader_wds(
                 'if no dataset length info is present.')
 
     num_batches_per_worker = 0
+    num_workers_nonzero = max(num_workers, 1)
     if is_training:
         assert batch_size >= 1, 'batching must be enabled for train, set batch_size>=1'
-        num_workers = max(1, num_workers)
         # We want to see the same # of batches on each member of the distributed group (GPU),
         # this is enforced by making each worker produce the same # of batches regardless of the
         # underlying iterator, so we estimate and make the iterator wrap around if end is hit.
@@ -93,8 +95,8 @@ def create_loader_wds(
         round_fn = math.floor if num_batches_round == 'floor' else math.ceil
         global_batch_size = batch_size * distributed.world_size
         num_batches = round_fn(num_samples / global_batch_size)
-        num_batches_per_worker = round_fn(num_batches / num_workers)  # per dataloader worker
-        num_batches = num_batches_per_worker * num_workers
+        num_batches_per_worker = round_fn(num_batches / num_workers_nonzero)  # per dataloader worker
+        num_batches = num_batches_per_worker * num_workers_nonzero
         num_samples = num_batches * global_batch_size
     else:
         # Eval / inference will exhaust the iterator if the size is not specified.
@@ -112,7 +114,7 @@ def create_loader_wds(
         # create a shared epoch store to sync epoch to dataloader worker proc
         shared_interval_count = SharedCount(count=start_interval)
         if not resampled:
-            assert num_shards >= num_workers * distributed.world_size, 'number of shards must be >= total workers'
+            assert num_shards >= num_workers_nonzero * distributed.world_size, 'number of shards must be >= total workers'
     else:
         shared_interval_count = None
 
@@ -132,12 +134,17 @@ def create_loader_wds(
         collate_fn=collate_fn,
     )
 
+    dl_generator = torch.Generator()
+    dl_generator.manual_seed(seed)
+
     dataloader = wds.WebLoader(
         datapipe,
         batch_size=None,  # batching done in data-pipeline
         shuffle=False,  # shuffling done in data-pipeline
         num_workers=num_workers,
         persistent_workers=persistent_workers and num_workers > 0,
+        generator=dl_generator,
+        worker_init_fn=seed_worker,
     )
 
     return LoaderBundle(
