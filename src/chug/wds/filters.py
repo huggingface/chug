@@ -1,27 +1,28 @@
 import itertools
 import random
-from typing import Mapping, Sequence
+from typing import Mapping, Sequence, Union
 
 import webdataset as wds
 from webdataset.filters import _shuffle
 
-from chug.common import SharedCount
-from .helpers import pytorch_worker_seed
+from chug.common import SharedCount, get_pytorch_worker_seed
 
 
 class detshuffle_v2(wds.PipelineStage):
 
     def __init__(
             self,
-            bufsize=1000,
-            initial=100,
-            seed=0,
-            interval=-1,
+            bufsize: int = 1000,
+            initial: int = 100,
+            seed: int = 0,
+            interval: Union[int, SharedCount] =-1,
+            unique_worker: bool = False,
     ):
         self.bufsize = bufsize
         self.initial = initial
         self.seed = seed
         self.interval = interval
+        self.unique_worker = unique_worker
 
     def run(self, src):
         if isinstance(self.interval, SharedCount):
@@ -33,11 +34,12 @@ class detshuffle_v2(wds.PipelineStage):
             interval = self.interval
 
         rng = random.Random()
-        if self.seed < 0:
-            # If seed is negative, we use the worker's seed, this will be different across all nodes/workers
-            seed = pytorch_worker_seed(interval)
+        if self.unique_worker:
+            # Use the PyTorch worker's seed, *different* across all nodes/workers
+            # but also deterministic if they are set consistently
+            seed = get_pytorch_worker_seed(interval, initial_seed=self.seed)
         else:
-            # This seed to be deterministic AND the same across all nodes/workers in each epoch
+            # This seed to be deterministic AND the *same* across all nodes/workers in each epoch/interval
             seed = self.seed + interval
         rng.seed(seed)
 
